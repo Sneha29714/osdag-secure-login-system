@@ -1,6 +1,7 @@
 const express=require("express");
 const cors=require("cors");
 const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 require("dotenv").config();
@@ -25,6 +26,14 @@ app.use(
         }
     })
 );
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: {
+        message: "Too many login attempts. Please try again later."
+    }
+});
 
 app.get("/",(req,res)=>{
     res.send("Custom Backend Running");
@@ -67,7 +76,7 @@ app.post("/register", async(req,res)=>{
     }
 });
 
-app.post("/login", async(req,res)=>{
+app.post("/login", loginLimiter,async(req,res)=>{
     try{
         const{ email,password }=req.body;
         if(!email || !password){
