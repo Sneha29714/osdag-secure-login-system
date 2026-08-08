@@ -112,6 +112,36 @@ app.post("/login", async(req,res)=>{
     }
 });
 
+app.get("/profile", (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            message: "Not authenticated"
+        });
+    }
+
+    res.json({
+        message: "You are authenticated",
+        userId: req.session.userId
+    });
+});
+
+app.post("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Could not log out"
+            });
+        }
+
+        res.clearCookie("connect.sid");
+
+        res.json({
+            message: "Logout successful"
+        });
+    });
+});
+
 app.listen(PORT,()=>{
     console.log(`${PORT} Server running!`);
 });
