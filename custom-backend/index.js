@@ -154,6 +154,70 @@ app.get("/me", async (req, res) => {
     }
 });
 
+app.get("/files", async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            message: "Not authenticated"
+        });
+    }
+
+    try {
+        const result = await pool.query(
+            `SELECT id, file_name, mime_type, size_bytes, uploaded_at
+             FROM files
+             WHERE owner_id = $1
+             ORDER BY uploaded_at DESC`,
+            [req.session.userId]
+        );
+
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Server error"
+        });
+    }
+});
+
+app.get("/files/:id", async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            message: "Not authenticated"
+        });
+    }
+
+    try {
+        const result = await pool.query(
+            `SELECT id, owner_id, file_name, mime_type, size_bytes, uploaded_at
+             FROM files
+             WHERE id = $1`,
+            [req.params.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "File not found"
+            });
+        }
+
+        const file = result.rows[0];
+
+        if (file.owner_id !== req.session.userId) {
+            return res.status(403).json({
+                message: "You do not have access to this file"
+            });
+        }
+
+        res.json(file);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Server error"
+        });
+    }
+});
+
 app.post("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
