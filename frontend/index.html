@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +34,8 @@
 <fieldset>
   <legend>Appwrite settings (only used in "Appwrite" mode)</legend>
   <label>Endpoint <input id="awEndpoint" value="https://cloud.appwrite.io/v1" size="40"></label>
-  <label>Project ID <input id="awProjectId" value="YOUR_PROJECT_ID" size="30"></label>
-  <label>Database ID <input id="awDatabaseId" value="YOUR_DATABASE_ID" size="30"></label>
+  <label>Project ID <input id="awProjectId" value="6a78385c00377c76eaf6" size="30"></label>
+  <label>Database ID <input id="awDatabaseId" value="6a7864550003fbf7514b" size="30"></label>
   <label>Files collection ID <input id="awFilesCollectionId" value="files" size="30"></label>
   <label>Storage bucket ID <input id="awBucketId" value="user-files" size="30"></label>
   <p>These map to resources you create yourself in the Appwrite console — see README for the exact setup (attributes, permissions, indexes).</p>
@@ -85,11 +84,8 @@
 <pre id="output">(responses will show up here)</pre>
 
 <script src="mock-api.js"></script>
-<!-- Appwrite Web SDK & adapter (Uncomment or include these when implementing the Appwrite backend mode) -->
-<!--
-<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@17"></script>
 <script src="appwrite-adapter.js"></script>
--->
 <script>
 function base() { return document.getElementById('baseUrl').value.replace(/\/$/, ''); }
 function useCookies() { return document.getElementById('useCookies').checked; }
@@ -122,6 +118,14 @@ async function request(path, options = {}) {
 async function doRegister() {
   const email = document.getElementById('regEmail').value;
   const password = document.getElementById('regPassword').value;
+
+  const mode = document.querySelector( 'input[name="backendMode"]:checked' ).value; 
+  if (mode === 'appwrite') { 
+    const result = await appwriteRegister(email, password); 
+    log('Appwrite REGISTER', result); 
+    return; 
+  }
+  
   const result = await request('/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -133,6 +137,15 @@ async function doRegister() {
 async function doLogin() {
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
+  
+  const mode = document.querySelector('input[name="backendMode"]:checked').value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteLogin(email, password);
+    log('Appwrite LOGIN', result);
+    return;
+  }
+
   const result = await request('/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -146,29 +159,72 @@ async function doLogin() {
 }
 
 async function doLogout() {
+  const mode = document.querySelector('input[name="backendMode"]:checked').value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteLogout();
+    log('Appwrite LOGOUT', result);
+    return;
+  }
+
   const result = await request('/logout', { method: 'POST' });
   document.getElementById('token').value = '';
   log('POST /logout', result);
 }
 
 async function getMe() {
+  const mode = document.querySelector('input[name="backendMode"]:checked').value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteGetMe();
+    log('Appwrite GET /me', result);
+    return;
+  }
+
   const result = await request('/me', { method: 'GET' });
   log('GET /me', result);
 }
 
 async function getFiles() {
+  const mode = document.querySelector('input[name="backendMode"]:checked').value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteGetFiles();
+    log('Appwrite GET /files', result);
+    return;
+  }
+
   const result = await request('/files', { method: 'GET' });
   log('GET /files', result);
 }
 
 async function getFileById() {
   const id = document.getElementById('fileId').value;
+
+  const mode = document.querySelector('input[name="backendMode"]:checked').value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteGetFileById(id);
+    log('Appwrite GET /files/' + id, result);
+    return;
+  }
+
   const result = await request('/files/' + id, { method: 'GET' });
   log('GET /files/' + id, result);
 }
 
 async function downloadFileById() {
   const id = document.getElementById('fileId').value;
+  const mode = document.querySelector(
+    'input[name="backendMode"]:checked'
+  ).value;
+
+  if (mode === 'appwrite') {
+    const result = await appwriteDownloadFileById(id);
+    log('Appwrite DOWNLOAD /files/' + id, result);
+    return;
+  }
+
   const headers = {};
   if (!useCookies() && tokenVal()) headers['Authorization'] = 'Bearer ' + tokenVal();
   const res = await fetch(base() + '/files/' + id + '/download', {
