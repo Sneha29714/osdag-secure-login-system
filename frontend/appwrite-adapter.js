@@ -4,13 +4,15 @@ appwriteClient
     .setEndpoint("https://sgp.cloud.appwrite.io/v1")
     .setProject("6a78385c00377c76eaf6");
 
-// Appwrite authentication service
 const appwriteAccount = new Appwrite.Account(appwriteClient);
 
+const appwriteTablesDB = new Appwrite.TablesDB(appwriteClient);
 
-// ======================================================
-// REGISTER
-// ======================================================
+const appwriteStorage = new Appwrite.Storage(appwriteClient);
+
+const DATABASE_ID = "6a7864550003fbf7514b";
+const FILES_TABLE_ID = "files";
+const STORAGE_BUCKET_ID = "user-files";
 
 async function appwriteRegister(email, password) {
     try {
@@ -38,11 +40,6 @@ async function appwriteRegister(email, password) {
     }
 }
 
-
-// ======================================================
-// LOGIN
-// ======================================================
-
 async function appwriteLogin(email, password) {
     try {
         const session = await appwriteAccount.createEmailPasswordSession(
@@ -68,11 +65,6 @@ async function appwriteLogin(email, password) {
     }
 }
 
-
-// ======================================================
-// LOGOUT
-// ======================================================
-
 async function appwriteLogout() {
     try {
         await appwriteAccount.deleteSession("current");
@@ -93,11 +85,6 @@ async function appwriteLogout() {
         };
     }
 }
-
-
-// ======================================================
-// GET CURRENT USER
-// ======================================================
 
 async function appwriteGetMe() {
     try {
@@ -121,3 +108,114 @@ async function appwriteGetMe() {
     }
 }
 
+async function appwriteGetFiles() {
+    try {
+        const user = await appwriteAccount.get();
+
+        const result = await appwriteTablesDB.listRows(
+            DATABASE_ID,
+            FILES_TABLE_ID
+        );
+
+        const userFiles = result.rows.filter(
+            file => file.ownerId === user.$id
+        );
+
+        return {
+            status: 200,
+            body: {
+                message: "Files retrieved successfully",
+                files: userFiles
+            }
+        };
+
+    } catch (error) {
+        return {
+            status: error.code || 400,
+            body: {
+                message: error.message
+            }
+        };
+    }
+}
+
+async function appwriteGetFileById(id) {
+    try {
+        const user = await appwriteAccount.get();
+
+        const file = await appwriteTablesDB.getRow(
+            DATABASE_ID,
+            FILES_TABLE_ID,
+            id
+        );
+
+        if (file.ownerId !== user.$id) {
+            return {
+                status: 403,
+                body: {
+                    message: "You do not have access to this file"
+                }
+            };
+        }
+
+        return {
+            status: 200,
+            body: {
+                message: "File retrieved successfully",
+                file: file
+            }
+        };
+
+    } catch (error) {
+        return {
+            status: error.code || 404,
+            body: {
+                message: error.message
+            }
+        };
+    }
+}
+
+async function appwriteUploadFile(file) {
+    try {
+        const user = await appwriteAccount.get();
+
+        const uploadedFile = await appwriteStorage.createFile(
+            STORAGE_BUCKET_ID,
+            Appwrite.ID.unique(),
+            file
+        );
+
+        const row = await appwriteTablesDB.createRow(
+            DATABASE_ID,
+            FILES_TABLE_ID,
+            Appwrite.ID.unique(),
+            {
+                ownerId: user.$id,
+                fileName: file.name,
+                mimeType: file.type || "application/octet-stream",
+                sizeBytes: file.size,
+                uploadedAt: new Date().toISOString(),
+                storageFileId: uploadedFile.$id
+            }
+        );
+
+        return {
+            status: 201,
+            body: {
+                message: "File uploaded successfully",
+                file: row
+            }
+        };
+
+    } catch (error) {
+        console.error("Upload error:", error);
+
+        return {
+            status: error.code || 400,
+            body: {
+                message: error.message
+            }
+        };
+    }
+}
