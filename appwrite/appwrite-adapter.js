@@ -176,6 +176,54 @@ async function appwriteGetFileById(id) {
     }
 }
 
+async function appwriteDownloadFileById(id) {
+    try {
+        console.log("1. FUNCTION CALLED");
+
+        const user = await appwriteAccount.get();
+        console.log("2. USER:", user.$id);
+
+        const file = await appwriteTablesDB.getRow(
+            DATABASE_ID,
+            FILES_TABLE_ID,
+            id
+        );
+
+        console.log("3. TABLE ROW:", file);
+
+        console.log("4. STORAGE FILE ID:", file.storageFileId);
+        console.log("5. BUCKET ID:", STORAGE_BUCKET_ID);
+
+        const url = await appwriteStorage.getFileDownload(
+            STORAGE_BUCKET_ID,
+            file.storageFileId
+        );
+
+        console.log("6. DOWNLOAD URL:", url);
+
+        // STOP HERE
+        window.open(url, "_blank");
+
+        return {
+            status: 200,
+            body: {
+                message: "URL opened",
+                url: url
+            }
+        };
+
+    } catch (error) {
+        console.error("DOWNLOAD ERROR:", error);
+
+        return {
+            status: error.code || 404,
+            body: {
+                message: error.message
+            }
+        };
+    }
+}
+
 async function appwriteUploadFile(file) {
     try {
         const user = await appwriteAccount.get();
