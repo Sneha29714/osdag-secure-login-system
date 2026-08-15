@@ -11,6 +11,7 @@ The same `index.html` testing client provided with the task is used for the impl
 
 ## Project Structure
 
+```text
 osdag-secure-login-system/
 │
 ├── appwrite/
@@ -101,6 +102,7 @@ Logout is not implemented by just deleting the cookie on the client.
 
 When `/logout` is called, the server destroys the current session and then clears the authentication cookie.
 
+```text
 POST /logout
      ↓
 Destroy server-side session
@@ -108,7 +110,7 @@ Destroy server-side session
 Clear authentication cookie
      ↓
 User is logged out
-
+```
 
 So even if an old session ID were available, the server would no longer consider that session authenticated.
 
@@ -122,6 +124,7 @@ The important part here is that the user ID comes from the authenticated session
 
 For example:
 
+```text
 Request
    ↓
 Session
@@ -131,7 +134,7 @@ Authenticated user ID
 Database query
    ↓
 Current user's profile
-
+```
 
 This means a user cannot simply change an ID in the request to retrieve somebody else's profile.
 
@@ -253,8 +256,10 @@ So the main difference is that the custom version implements these backend servi
 
 The task includes:
 
+```text
 mock-api.js
 seed-data.json
+```
 
 These were useful for understanding the expected client-side behavior and API structure.
 
@@ -262,11 +267,15 @@ However, they are **not used as the actual backend**.
 
 The actual implementations are:
 
+```text
 custom-backend/
+```
 
 and:
 
+```text
 appwrite/
+```
 
 The Appwrite implementation communicates with the actual Appwrite services.
 
@@ -284,12 +293,15 @@ Each user has:
 
 Example:
 
+```text
 User 1 → Profile + Files
 User 2 → Profile + Files
 User 3 → Profile + Files
+```
 
 ### Test credentials
 
+```text
 User 1
 Email: <email>
 Password: <password>
@@ -301,6 +313,7 @@ Password: <password>
 User 3
 Email: <email>
 Password: <password>
+```
 
 These credentials are only for testing/evaluation.
 
