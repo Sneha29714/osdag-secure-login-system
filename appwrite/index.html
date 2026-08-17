@@ -46,22 +46,22 @@
 <fieldset>
   <legend>Quick-fill seeded test users</legend>
   <p>These are just convenience buttons that fill the login form below — they are NOT real credentials, edit them to match whatever you seed.</p>
-  <button onclick="fillUser('alice@example.com','Password123!')">User A: alice@example.com</button>
-  <button onclick="fillUser('bob@example.com','Password123!')">User B: bob@example.com</button>
-  <button onclick="fillUser('carol@example.com','Password123!')">User C: carol@example.com</button>
+  <button onclick="fillUser('fossee.test1@gmail.com','FOSSEE123')">User A: fossee.test1@gmail.com</button>
+  <button onclick="fillUser('fossee.test2@gmail.com','FOSSEE123')">User B: fossee.test2@gmail.com</button>
+  <button onclick="fillUser('fossee.test3@gmail.com','FOSSEE123')">User C: fossee.test3@gmail.com</button>
 </fieldset>
 
 <fieldset>
   <legend>Register</legend>
-  <label>Email <input id="regEmail" value="alice@example.com"></label>
-  <label>Password <input id="regPassword" type="text" value="Password123!"></label>
+  <label>Email <input id="regEmail" value="fossee.test1@gmail.com"></label>
+  <label>Password <input id="regPassword" type="text" value="FOSSEE123"></label>
   <button onclick="doRegister()">Register</button>
 </fieldset>
 
 <fieldset>
   <legend>Login</legend>
-  <label>Email <input id="loginEmail" value="alice@example.com"></label>
-  <label>Password <input id="loginPassword" type="text" value="Password123!"></label>
+  <label>Email <input id="loginEmail" value="fossee.test1@gmail.com"></label>
+  <label>Password <input id="loginPassword" type="text" value="FOSSEE123"></label>
   <button onclick="doLogin()">Login</button>
   <button onclick="doLogout()">Logout</button>
 </fieldset>
@@ -83,7 +83,6 @@
 <h3>Response</h3>
 <pre id="output">(responses will show up here)</pre>
 
-<script src="mock-api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/appwrite@25.2.0"></script>
 <script src="appwrite-adapter.js"></script>
 <script>
