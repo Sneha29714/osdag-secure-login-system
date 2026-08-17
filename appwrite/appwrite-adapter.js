@@ -12,7 +12,7 @@ const appwriteStorage = new Appwrite.Storage(appwriteClient);
 
 const DATABASE_ID = "6a7864550003fbf7514b";
 const FILES_TABLE_ID = "files";
-const STORAGE_BUCKET_ID = "user-files";
+const STORAGE_BUCKET_ID = "6a81c401000a42a7812d";
 
 async function appwriteRegister(email, password) {
     try {
@@ -178,10 +178,8 @@ async function appwriteGetFileById(id) {
 
 async function appwriteDownloadFileById(id) {
     try {
-        console.log("1. FUNCTION CALLED");
 
         const user = await appwriteAccount.get();
-        console.log("2. USER:", user.$id);
 
         const file = await appwriteTablesDB.getRow(
             DATABASE_ID,
@@ -189,19 +187,11 @@ async function appwriteDownloadFileById(id) {
             id
         );
 
-        console.log("3. TABLE ROW:", file);
-
-        console.log("4. STORAGE FILE ID:", file.storageFileId);
-        console.log("5. BUCKET ID:", STORAGE_BUCKET_ID);
-
         const url = await appwriteStorage.getFileDownload(
             STORAGE_BUCKET_ID,
             file.storageFileId
         );
 
-        console.log("6. DOWNLOAD URL:", url);
-
-        // STOP HERE
         window.open(url, "_blank");
 
         return {
@@ -213,7 +203,6 @@ async function appwriteDownloadFileById(id) {
         };
 
     } catch (error) {
-        console.error("DOWNLOAD ERROR:", error);
 
         return {
             status: error.code || 404,
