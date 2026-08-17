@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const express=require("express");
 const cors=require("cors");
 const bcrypt = require("bcrypt");
@@ -111,7 +113,6 @@ app.post("/login", loginLimiter,async(req,res)=>{
         }
 
         req.session.userId = user.id;
-
         res.json({
             message: "Login successful"
         });
@@ -138,6 +139,8 @@ app.get("/profile", (req, res) => {
 });
 
 app.get("/me", async (req, res) => {
+        console.log("ME SESSION:", req.session);
+
     if (!req.session.userId) {
         return res.status(401).json({
             message: "Not authenticated"
@@ -224,6 +227,54 @@ app.get("/files/:id", async (req, res) => {
 
     } catch (err) {
         console.error(err);
+        res.status(500).json({
+            message: "Server error"
+        });
+    }
+});
+
+app.get("/files/:id/download", async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            message: "Not authenticated"
+        });
+    }
+
+    try {
+        const result = await pool.query(
+            `SELECT id, owner_id, file_name, mime_type
+             FROM files
+             WHERE id = $1`,
+            [req.params.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "File not found"
+            });
+        }
+
+        const file = result.rows[0];
+
+        if (file.owner_id !== req.session.userId) {
+            return res.status(403).json({
+                message: "You do not have access to this file"
+            });
+        }
+
+        const filePath = path.join(__dirname, "uploads", file.file_name);
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                message: "Physical file not found"
+            });
+        }
+
+        res.download(filePath, file.file_name);
+
+    } catch (err) {
+        console.error(err);
+
         res.status(500).json({
             message: "Server error"
         });
