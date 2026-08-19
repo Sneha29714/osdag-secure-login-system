@@ -187,6 +187,15 @@ async function appwriteDownloadFileById(id) {
             id
         );
 
+        if (file.ownerId !== user.$id) {
+            return {
+                status: 403,
+                body: {
+                    message: "You do not have access to this file"
+                }
+            };
+        }
+        
         const url = await appwriteStorage.getFileDownload(
             STORAGE_BUCKET_ID,
             file.storageFileId

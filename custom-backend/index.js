@@ -262,7 +262,7 @@ app.get("/files/:id/download", async (req, res) => {
             });
         }
 
-        const filePath = path.join(__dirname, "uploads", file.file_name);
+        const filePath = path.join(__dirname,"..", "uploads", file.file_name);
 
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({
