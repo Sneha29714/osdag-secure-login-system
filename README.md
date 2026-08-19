@@ -23,13 +23,7 @@ cd osdag-secure-login-system
 
 The Custom Backend uses Node.js, Express.js, PostgreSQL, and server-side sessions.
 
-### Step 2.1: Create the PostgreSQL Database
-
-Create a PostgreSQL database named:
-
-`auth_system`
-
-### Step 2.2: Create the Database Tables
+### Step 2.1: Create the PostgreSQL Database and Database Tables
 
 The database schema is provided in:
 
@@ -37,7 +31,7 @@ The database schema is provided in:
 
 Create a PostgreSQL database and execute `custom-backend/schema.sql` in its Query Tool.
 
-### Step 2.3: Configure Environment Variables
+### Step 2.2: Configure Environment Variables
 
 Copy:
 
@@ -61,13 +55,13 @@ DB_PASSWORD=your_postgres_password
 SESSION_SECRET=replace_with_a_long_random_secret
 ```
 
-### Step 2.4: Install Dependencies
+### Step 2.3: Install Dependencies
 
 ```bash
 cd custom-backend
 npm install
 ```
-### Step 2.5: Seed Test Users and Files
+### Step 2.4: Seed Test Users and Files
 
 Run:
 ```bash
@@ -81,7 +75,7 @@ The seeded accounts are:
 | User 2 | `fossee.test2@gmail.com` | `FOSSEE123` |
 | User 3 | `fossee.test3@gmail.com` | `FOSSEE123` |
 
-### Step 2.6: Start the Custom Backend
+### Step 2.5: Start the Custom Backend
 
 Run:
 ```bash
@@ -122,13 +116,13 @@ APPWRITE_BUCKET_ID=your_bucket_id
 APPWRITE_API_KEY=your_api_key
 ```
 
-### Step 3.3: Install Dependencies
+### Step 3.2: Install Dependencies
 
 ```bash
 cd appwrite-backend
 npm install
 ```
-### Step 3.4: Seed Appwrite Test Data
+### Step 3.3: Seed Appwrite Test Data
 
 ```bash
 node appwrite-seed.js
