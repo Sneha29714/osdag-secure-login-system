@@ -139,7 +139,6 @@ app.get("/profile", (req, res) => {
 });
 
 app.get("/me", async (req, res) => {
-        console.log("ME SESSION:", req.session);
 
     if (!req.session.userId) {
         return res.status(401).json({
